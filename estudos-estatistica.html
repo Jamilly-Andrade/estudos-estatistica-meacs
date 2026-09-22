@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Caderno Completo de Métodos Estatísticos (MEACS) - FGV ECMI</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --sidebar-bg: #070d19;
+      --card-bg: #151f32;
+      --card-border: #233554;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --accent: #c084fc;
+      --accent-bg: rgba(192, 132, 252, 0.1);
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --code-bg: #030712;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+    }
+
+    nav.sidebar {
+      width: 320px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      background-color: var(--sidebar-bg);
+      border-right: 1px solid var(--card-border);
+      padding: 24px 16px;
+      overflow-y: auto;
+      flex-shrink: 0;
+    }
+
+    nav.sidebar h2 {
+      font-size: 1.05rem;
+      color: var(--primary);
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    nav.sidebar p.sub {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+    }
+
+    .search-box {
+      width: 100%;
+      padding: 10px 14px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      color: var(--text);
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .search-box:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.25);
+    }
+
+    .nav-group-title {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin: 14px 8px 6px 8px;
+      font-weight: 700;
+    }
+
+    nav.sidebar ul {
+      list-style: none;
+      margin-bottom: 10px;
+    }
+
+    nav.sidebar li {
+      margin-bottom: 3px;
+    }
+
+    nav.sidebar a {
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.84rem;
+      display: block;
+      padding: 6px 10px;
+      border-radius: 6px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    nav.sidebar a:hover {
+      color: #fff;
+      background-color: var(--card-bg);
+      border-left: 3px solid var(--primary);
+      padding-left: 12px;
+    }
+
+    main.content {
+      flex: 1;
+      padding: 40px 54px;
+      max-width: 1180px;
+      overflow-y: auto;
+    }
+
+    header.header {
+      margin-bottom: 36px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      color: #fff;
+      letter-spacing: -0.02em;
+      margin-bottom: 8px;
+    }
+
+    header p {
+      color: var(--text-muted);
+      font-size: 1rem;
+    }
+
+    .badge-bar {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 4px 12px;
+      border-radius: 9999px;
+      background-color: rgba(56, 189, 248, 0.12);
+      color: var(--primary);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    .badge.success {
+      background-color: rgba(52, 211, 153, 0.12);
+      color: var(--success);
+      border-color: rgba(52, 211, 153, 0.25);
+    }
+
+    .badge.warn {
+      background-color: rgba(251, 191, 36, 0.12);
+      color: var(--warning);
+      border-color: rgba(251, 191, 36, 0.25);
+    }
+
+    .badge.danger {
+      background-color: rgba(248, 113, 113, 0.12);
+      color: var(--danger);
+      border-color: rgba(248, 113, 113, 0.25);
+    }
+
+    .card {
+      background-color: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 28px;
+      margin-bottom: 36px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.25);
+    }
+
+    .card h2 {
+      font-size: 1.45rem;
+      color: #fff;
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      padding-bottom: 12px;
+    }
+
+    .card h3 {
+      font-size: 1.15rem;
+      color: var(--primary);
+      margin: 22px 0 12px 0;
+    }
+
+    .card h4 {
+      font-size: 0.98rem;
+      color: #e2e8f0;
+      margin: 16px 0 8px 0;
+    }
+
+    p, ul, ol {
+      color: #cbd5e1;
+      font-size: 0.94rem;
+      margin-bottom: 14px;
+    }
+
+    ul, ol {
+      padding-left: 24px;
+    }
+
+    li {
+      margin-bottom: 6px;
+    }
+
+    strong {
+      color: #f8fafc;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 16px 0 24px 0;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--card-border);
+    }
+
+    th {
+      background-color: rgba(7, 13, 25, 0.8);
+      color: var(--primary);
+      font-weight: 600;
+    }
+
+    tr:hover td {
+      background-color: rgba(255, 255, 255, 0.02);
+    }
+
+    .code-container {
+      position: relative;
+      background-color: var(--code-bg);
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      margin: 16px 0 22px 0;
+      overflow: hidden;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 14px;
+      background: #060a12;
+      border-bottom: 1px solid #1e293b;
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    pre {
+      padding: 16px;
+      overflow-x: auto;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.86rem;
+      color: #e2e8f0;
+      line-height: 1.55;
+    }
+
+    .copy-btn {
+      background: #1e293b;
+      border: 1px solid var(--card-border);
+      color: var(--text);
+      font-size: 0.74rem;
+      padding: 4px 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--primary);
+      color: #000;
+      border-color: var(--primary);
+    }
+
+    .copy-btn.copied {
+      background: var(--success);
+      color: #000;
+      border-color: var(--success);
+    }
+
+    .callout-interpret {
+      background-color: var(--accent-bg);
+      border-left: 4px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+
+    .callout-interpret h4 {
+      color: #e9d5ff;
+      font-size: 0.95rem;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .callout-interpret p {
+      color: #f3e8ff;
+      margin: 0;
+      font-size: 0.93rem;
+    }
+
+    .callout-tip {
+      background-color: rgba(56, 189, 248, 0.08);
+      border-left: 4px solid var(--primary);
+      border-radius: 0 8px 8px 0;
+      padding: 14px 18px;
+      margin: 16px 0;
+    }
+
+    .callout-tip strong {
+      color: var(--primary);
+    }
+
+    /* Adapt Alert Box */
+    .callout-adapt {
+      background-color: rgba(251, 191, 36, 0.08);
+      border-left: 4px solid var(--warning);
+      border-radius: 0 8px 8px 0;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+
+    .callout-adapt h4 {
+      color: #fde68a;
+      font-size: 0.95rem;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .callout-adapt ul {
+      margin-bottom: 0;
+      padding-left: 20px;
+    }
+
+    .callout-adapt li {
+      color: #fef3c7;
+      font-size: 0.9rem;
+    }
+
+    .formula {
+      display: inline-block;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-family: monospace;
+      color: #38bdf8;
+      font-size: 0.92rem;
+    }
+
+    .pill-change {
+      background-color: rgba(248, 113, 113, 0.2);
+      color: #fca5a5;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    .pill-keep {
+      background-color: rgba(52, 211, 153, 0.2);
+      color: #6ee7b7;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        flex-direction: column;
+      }
+      nav.sidebar {
+        width: 100%;
+        height: auto;
+        position: relative;
+      }
+      main.content {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navigation Sidebar -->
+  <nav class="sidebar">
+    <h2>📖 Anotações MEACS</h2>
+    <p class="sub">Material de Apoio e Roteiro de Prova</p>
+    <input type="text" id="search" class="search-box" placeholder="Filtrar assunto, código ou caso..." onkeyup="filterContent()">
+    
+    <div class="nav-group-title">⚡ GUIA DE ADAPTAÇÃO RÁPIDA</div>
+    <ul>
+      <li><a href="#como-adaptar">🚨 Como Adaptar Códigos na Prova</a></li>
+      <li><a href="#setup">0. Setup Inicial no Colab</a></li>
+    </ul>
+
+    <div class="nav-group-title">Teoria das Aulas (Slides & Moore)</div>
+    <ul>
+      <li><a href="#modulo-variaveis">1. Dados e Classificação de Variáveis</a></li>
+      <li><a href="#modulo-categoricos">2. Dados Categóricos & Dupla Entrada</a></li>
+      <li><a href="#modulo-histogramas">3. Histogramas & Séries Temporais</a></li>
+      <li><a href="#modulo-centro">4. Medidas de Centro (Média vs Mediana)</a></li>
+      <li><a href="#modulo-dispersao">5. Dispersão, Quartis & Boxplot</a></li>
+      <li><a href="#modulo-indicadores">6. Indicadores Sociais & Taxas</a></li>
+      <li><a href="#modulo-bivariada">7. Correlação de Pearson & Dispersão</a></li>
+      <li><a href="#modulo-casos">8. Casos de Referência (Shipman, Bristol...)</a></li>
+    </ul>
+
+    <div class="nav-group-title">Roteiro de Códigos da Prova (Adaptável)</div>
+    <ul>
+      <li><a href="#prova-q1">Op 1: Categórica Simples (Barras/Pizza)</a></li>
+      <li><a href="#prova-q1b">Op 2: Categórica Cruzada (100% Normalizada)</a></li>
+      <li><a href="#prova-q2">Op 3: Série Temporal & Resample Mensal</a></li>
+      <li><a href="#prova-q3-p1">Op 4: Pergunta Teórica (Média vs Mediana)</a></li>
+      <li><a href="#prova-q3-p2a">Op 5: Histograma, Describe & AIQ</a></li>
+      <li><a href="#prova-q3-p2b">Op 6: Dispersão, Pearson & Outlier</a></li>
+      <li><a href="#prova-q3-p2c">Op 7: Boxplots Comparativos Lado a Lado</a></li>
+      <li><a href="#checklist">Checklist Final de Envio</a></li>
+    </ul>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="content">
+
+    <header class="header">
+      <h1>Caderno de Anotações e Estudos - Métodos Estatísticos</h1>
+      <p>Material completo de consulta integrando a teoria de todas as aulas (Aulas 2 a 15) ao roteiro prático e instruções de adaptação de código para a avaliação da Profª Polyana Barboza (FGV ECMI).</p>
+      <div class="badge-bar">
+        <span class="badge success">✓ Responde 100% da Prova</span>
+        <span class="badge">Google Colab & Altair</span>
+        <span class="badge warn">Com Instruções de Adaptação de Colunas</span>
+      </div>
+    </header>
+
+    <!-- GUIA DE ADAPTAÇÃO RÁPIDA -->
+    <section id="como-adaptar" class="card" style="border: 2px solid var(--warning);">
+      <h2>🚨 COMO ADAPTAR QUALQUER CÓDIGO DESTE GUIA PARA A PROVA DE HOJE</h2>
+      <p>A professora vai te dar um ou mais arquivos de dados (ex: arquivos <code>.csv</code> ou <code>.xls</code>). As perguntas serão as mesmas do semestre passado, mas os <strong>nomes dos arquivos</strong> e os <strong>nomes das colunas</strong> serão diferentes. Siga estes 3 passos simples:</p>
+
+      <h3>Passo 1: Descubra os nomes exatos das colunas da sua prova</h3>
+      <p>Assim que carregar a base no Colab, rode:</p>
+      <div class="code-container">
+        <div class="code-header">
+          <span>Python / Colab - Inspecionar Colunas</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar Código</button>
+        </div>
+        <pre><code># Mostra os nomes de todas as colunas da sua base
+print(df.columns.tolist())
+
+# Mostra as primeiras 3 linhas para ver os dados reais
+df.head(3)</code></pre>
+      </div>
+
+      <h3>Passo 2: Entenda o que mudar e o que NUNCA mudar nos códigos</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Elemento</th>
+            <th>O que é?</th>
+            <th>Devo alterar na hora da prova?</th>
+            <th>Exemplo Prático</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="pill-change">nome_do_dataframe</span></td>
+            <td>A variável onde você leu o CSV</td>
+            <td><strong style="color: var(--danger);">SIM</strong> (use o nome que você deu ao ler)</td>
+            <td>Troque <code>enem</code> ou <code>censo</code> por <code>df</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill-change">'NOME_DA_COLUNA'</span></td>
+            <td>A coluna que a questão pediu para analisar</td>
+            <td><strong style="color: var(--danger);">SIM</strong> (copie o nome exato do <code>df.columns</code>)</td>
+            <td>Se pedir escolaridade em vez de cor, troque <code>'TP_COR_RACA'</code> por <code>'Escolaridade'</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill-keep">alt.Chart(...).mark_...()</span></td>
+            <td>A sintaxe do Altair</td>
+            <td><strong style="color: var(--success);">NÃO MEXA</strong> (é sempre idêntica)</td>
+            <td>Mantenha <code>mark_bar()</code>, <code>mark_line()</code>, etc.</td>
+          </tr>
+          <tr>
+            <td><span class="pill-keep">'count()'</span></td>
+            <td>Contagem de linhas</td>
+            <td><strong style="color: var(--success);">NÃO MEXA</strong></td>
+            <td>Mantenha <code>y='count()'</code> ou <code>theta='count()'</code></td>
+          </tr>
+          <tr>
+            <td><span class="pill-keep">:N, :Q, :T, :O</span></td>
+            <td>Tipo de dado do Altair</td>
+            <td><strong style="color: var(--success);">NÃO MEXA</strong></td>
+            <td><code>:N</code> = Categórico | <code>:Q</code> = Numérico | <code>:T</code> = Data</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h3>Passo 3: Como saber qual operação da prova usar</h3>
+      <ul>
+        <li>Se a questão pedir para <strong>analisar uma variável qualitativa/categórica</strong> (ex: sexo, cor, partido, estado) ➔ Vá para a <a href="#prova-q1">Operação 1 (Barras/Pizza)</a>.</li>
+        <li>Se pedir para <strong>cruzar duas qualitativas</strong> (ex: cor e acesso, escolaridade e renda em faixas) ➔ Vá para a <a href="#prova-q1b">Operação 2 (Tabela Cruzada & Barras 100%)</a>.</li>
+        <li>Se tiver <strong>data</strong> (dia, mês, ano) e pedir evolução no tempo ➔ Vá para a <a href="#prova-q2">Operação 3 (Série Temporal & Resample)</a>.</li>
+        <li>Se perguntar <strong>o que significa a média ser maior que a mediana</strong> ➔ Vá para a <a href="#prova-q3-p1">Operação 4 (Pergunta Teórica PNAD)</a>.</li>
+        <li>Se pedir <strong>análise univariada de variável quantitativa contínua</strong> (renda, nota, temperatura) ➔ Vá para a <a href="#prova-q3-p2a">Operação 5 (Histograma, Describe e AIQ)</a>.</li>
+        <li>Se pedir <strong>análise bivariada de duas quantitativas / relação linear / Pearson</strong> ➔ Vá para a <a href="#prova-q3-p2b">Operação 6 (Dispersão, Pearson e Outlier)</a>.</li>
+        <li>Se pedir para <strong>comparar grupos (homens vs mulheres, etc.) com regra 1.5xAIQ</strong> ➔ Vá para a <a href="#prova-q3-p2c">Operação 7 (Boxplots Lado a Lado)</a>.</li>
+      </ul>
+    </section>
+
+    <!-- 0. SETUP -->
+    <section id="setup" class="card">
+      <h2>⚙️ 0. Configuração Obrigatória no Google Colab</h2>
+      <p>Execute esta célula <strong>sempre na primeira linha</strong> do Colab para carregar as bibliotecas e evitar o erro de limite de 5.000 linhas do Altair:</p>
+      
+      <div class="code-container">
+        <div class="code-header">
+          <span>Python / Colab - Sempre Rodar Primeiro</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar Código</button>
+        </div>
+        <pre><code>import pandas as pd
+import altair as alt
+
+# Desativa limite de linhas para o Altair plotar bases grandes sem travar
+alt.data_transformers.disable_max_rows()
+pd.set_option('display.max_columns', None)</code></pre>
+      </div>
+
+      <div class="callout-adapt">
+        <h4>⚠️ Como ler os arquivos da prova de hoje:</h4>
+        <ul>
+          <li>Suba os arquivos clicando na <strong>Pastinha</strong> no menu lateral esquerdo do Colab.</li>
+          <li>Se for CSV: <code>df = pd.read_csv('nome_do_arquivo.csv')</code> <em>(se as colunas vierem todas juntas numa só, troque por <code>df = pd.read_csv('nome_do_arquivo.csv', sep=';')</code>)</em>.</li>
+          <li>Se for Excel: <code>df = pd.read_excel('nome_do_arquivo.xls')</code>.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- 1. DADOS E VARIÁVEIS -->
+    <section id="modulo-variaveis" class="card">
+      <h2>📋 1. Dados, Indivíduos e Classificação de Variáveis (Aulas 2 & 3)</h2>
+      <p>Conceito inicial do livro-texto (Moore) e das aulas de abertura:</p>
+      <ul>
+        <li><strong>Indivíduos (Unidades de Análise / Observações)</strong>: Os objetos ou pessoas descritos por um conjunto de dados (ex: estudantes no ENEM, municípios do Brasil, pacientes de um hospital, dias de medição meteorológica).</li>
+        <li><strong>Variáveis</strong>: Qualquer característica associada a um indivíduo que assume valores distintos para indivíduos diferentes.</li>
+      </ul>
+
+      <h3>Quadro Geral de Classificação</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Tipo Geral</th>
+            <th>Subtipo</th>
+            <th>Definição</th>
+            <th>Exemplos das Aulas e Provas</th>
+            <th>Gráficos Adequados</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td rowspan="2"><strong>Qualitativa (Categórica)</strong></td>
+            <td><strong>Nominal</strong></td>
+            <td>Categorias sem qualquer relação de ordem ou hierarquia.</td>
+            <td>Cor/Raça, Sexo (M/F), Unidade Federativa (UF), Bairro, Se tem internet (Sim/Não), Formato de Rádio.</td>
+            <td>Barras simples, Setores (Pizza).</td>
+          </tr>
+          <tr>
+            <td><strong>Ordinal</strong></td>
+            <td>Categorias com ordem ou hierarquia implícita natural.</td>
+            <td>Nível de escolaridade (Fundamental, Médio, Superior), Faixa etária, Escala de satisfação (Ruim, Regular, Bom).</td>
+            <td>Barras com categorias ordenadas.</td>
+          </tr>
+          <tr>
+            <td rowspan="2"><strong>Quantitativa (Numérica)</strong></td>
+            <td><strong>Discreta</strong></td>
+            <td>Resultante de contagens (números inteiros, sem valores intermediários).</td>
+            <td>Número de filhos, quantidade de parceiros sexuais, contagem de homicídios em um ano.</td>
+            <td>Gráfico de barras, Histograma.</td>
+          </tr>
+          <tr>
+            <td><strong>Contínua</strong></td>
+            <td>Resultante de medições contínuas (pode assumir qualquer valor real em um intervalo).</td>
+            <td>Renda per capita, Temperatura máxima, Expectativa de vida ao nascer, Taxa de mortalidade infantil.</td>
+            <td>Histograma, Boxplot, Série Temporal (Linha), Dispersão.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- 2. DADOS CATEGÓRICOS -->
+    <section id="modulo-categoricos" class="card">
+      <h2>📊 2. Dados Categóricos e Distribuições Condicionais (Aulas 3 & 4)</h2>
+      <h3>Gráfico de Setores (Pizza) vs Gráfico de Barras</h3>
+      <ul>
+        <li><strong>Gráfico de Setores (Pizza / <code>mark_arc</code>)</strong>: Só deve ser usado quando as categorias formam as partes que <strong>somam 100% de um todo</strong> e não se sobrepõem. Se faltarem categorias ou as pessoas puderem escolher mais de uma opção, <strong>não</strong> use pizza!</li>
+        <li><strong>Gráfico de Barras (<code>mark_bar</code>)</strong>: É a representação mais clara e versátil. Permite comparar categorias mesmo que não perfaçam 100% do total e facilita ver pequenas diferenças de altura.</li>
+      </ul>
+    </section>
+
+    <!-- 3. HISTOGRAMAS E SÉRIES TEMPORAIS -->
+    <section id="modulo-histogramas" class="card">
+      <h2>📉 3. Histogramas e Séries Temporais (Aulas 5 & 6)</h2>
+      <h3>Histograma: Distribuição de Quantitativas Contínuas</h3>
+      <ul>
+        <li><strong>Forma Simétrica</strong>: Os lados direito e esquerdo são imagens aproximadas no espelho (formato de sino / normal). Média muito próxima da mediana.</li>
+        <li><strong>Assimétrica à Direita (Positiva)</strong>: A cauda direita (valores mais altos) é muito mais longa. A maioria se concentra nos valores baixos (ex: Renda, Salários, Emissões de CO2). Aqui, <span class="formula">Média &gt; Mediana</span>.</li>
+        <li><strong>Assimétrica à Esquerda (Negativa)</strong>: A cauda esquerda (valores mais baixos) é mais longa. A maioria se concentra nos valores altos. Aqui, <span class="formula">Média &lt; Mediana</span>.</li>
+        <li><strong>Unimodal vs Bimodal</strong>: Um pico predominante (unimodal) ou dois picos distintos (bimodal — ex: no caso do assassino Shipman, mortes de médicos normais têm pico único, enquanto com Shipman havia um segundo pico anômalo à tarde).</li>
+      </ul>
+    </section>
+
+    <!-- 4. MEDIDAS DE CENTRO -->
+    <section id="modulo-centro" class="card">
+      <h2>⚖️ 4. Medidas Centrais de Resumo: O Grande Embate Média vs Mediana (Aula 8)</h2>
+      <p>Uma das perguntas conceituais mais garantidas na prova:</p>
+      <ul>
+        <li><strong>Média Aritmética ($\bar{x}$)</strong>: Soma de tudo / N. É <strong>NÃO RESISTENTE</strong> a outliers (arrastada por valores extremos).</li>
+        <li><strong>Mediana ($M$)</strong>: Valor do meio (50%). É <strong>RESISTENTE</strong> a outliers (representa o indivíduo típico).</li>
+      </ul>
+    </section>
+
+    <!-- 5. DISPERSÃO, QUARTIS E BOXPLOT -->
+    <section id="modulo-dispersao" class="card">
+      <h2>📦 5. Dispersão, Quartis e o Boxplot com a Regra 1.5×AIQ (Aulas 9, 10 & 11)</h2>
+      <ul>
+        <li><strong>Amplitude Interquartil ($AIQ$)</strong>: <span class="formula">AIQ = Q3 - Q1</span> (dispersão dos 50% centrais dos dados; resistente).</li>
+        <li><strong>Regra $1.5 \times AIQ$ para Outliers (Tukey)</strong>:
+          <ul>
+            <li><span class="formula">Limite Inferior = Q1 - (1.5 × AIQ)</span></li>
+            <li><span class="formula">Limite Superior = Q3 + (1.5 × AIQ)</span></li>
+            <li>Qualquer ponto fora desses limites é formalmente um <strong>valor atípico (outlier)</strong>.</li>
+          </ul>
+        </li>
+      </ul>
+    </section>
+
+    <!-- 6. INDICADORES SOCIAIS -->
+    <section id="modulo-indicadores" class="card">
+      <h2>🌐 6. Indicadores Sociais e Medidas Per Capita (Aula 12)</h2>
+      <p>Dividir a quantidade pelo número de habitantes (taxa de mortalidade por 1.000 nascidos, renda domiciliar per capita) serve para <strong>equalizar comparações territoriais</strong> entre locais populosos e pequenos.</p>
+    </section>
+
+    <!-- 7. CORRELAÇÃO DE PEARSON -->
+    <section id="modulo-bivariada" class="card">
+      <h2>🎯 7. Análise Bivariada Quantitativa e Coeficiente de Pearson (Aulas 13 & 14)</h2>
+      <ul>
+        <li><strong>Coeficiente $r$</strong> varia de -1 a +1:
+          <ul>
+            <li>$r > 0$: Associação positiva | $r < 0$: Associação negativa.</li>
+            <li>$|r| \ge 0.7$: Forte | $0.3 \le |r| < 0.7$: Moderada | $|r| < 0.3$: Fraca.</li>
+          </ul>
+        </li>
+        <li><strong>Atenção</strong>: Pearson é <strong>não resistente</strong> a outliers. Um único ponto pode puxar o coeficiente para cima ou para baixo. E só detecta relações <strong>lineares</strong> (alerta do <em>Datasaurus Dozen</em>).</li>
+      </ul>
+    </section>
+
+    <!-- 8. CASOS DE REFERÊNCIA -->
+    <section id="modulo-casos" class="card">
+      <h2>🔍 8. Casos das Aulas para Lembrar nas Interpretações</h2>
+      <ul>
+        <li><strong>Harold Shipman</strong>: Distribuição bimodal no horário das mortes (pico anômalo à tarde durante visitas); vítimas idosas e mulheres pela tabela de dupla entrada.</li>
+        <li><strong>Bebês de Bristol</strong>: Dispersão mostrando taxa de sobrevivência cirúrgica; hospital de Bristol como outlier negativo severo.</li>
+        <li><strong>Parceiros Sexuais (Natsal)</strong>: Homens relataram média de 15 e mulheres 6. A média masculina foi inflada por poucos homens relatando centenas/milhares (não resistente). A mediana foi idêntica entre os sexos (resistente).</li>
+      </ul>
+    </section>
+
+    <!-- ROTEIRO ADAPTÁVEL: OPERAÇÃO 1 -->
+    <section id="prova-q1" class="card">
+      <h2>Op 1. Variável Qualitativa Univariada (Barras e Setores/Pizza)</h2>
+      <p>Use quando a prova pedir: <em>"Faça a análise univariada de uma variável qualitativa..."</em></p>
+
+      <div class="callout-adapt">
+        <h4>⚠️ O QUE ALTERAR NO CÓDIGO ABAIXO:</h4>
+        <ul>
+          <li>Substitua <code>df</code> pelo nome do seu dataframe.</li>
+          <li>Substitua <code>'COLUNA_CATEGORICA'</code> pelo nome da coluna da prova (ex: <code>'TP_COR_RACA'</code>, <code>'TP_SEXO'</code>, <code>'Escolaridade'</code>).</li>
+          <li><strong>Não altere</strong>: <code>alt.Chart</code>, <code>mark_bar()</code>, <code>sort='-y'</code>, <code>'count()'</code>.</li>
+        </ul>
+      </div>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Altair - Gráfico de Barras Ordenado (Qualitativa)</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar Código</button>
+        </div>
+        <pre><code># Gráfico de barras ordenado decrescente por frequência
+alt.Chart(df).mark_bar().encode(
+    x=alt.X('COLUNA_CATEGORICA', sort='-y', title="Categoria"),
+    y=alt.Y('count()', title="Frequência Absoluta"),
+    tooltip=['COLUNA_CATEGORICA', 'count()']
+).properties(width=400, height=300)</code></pre>
+      </div>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Altair - Gráfico de Setores (Pizza)</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar Código</button>
+        </div>
+        <pre><code># Gráfico de setores (pizza) - Apenas se as categorias somarem 100% de um todo
+alt.Chart(df).mark_arc().encode(
+    theta="count()",
+    color=alt.Color('COLUNA_CATEGORICA', title="Categoria"),
+    tooltip=['COLUNA_CATEGORICA', 'count()']
+)</code></pre>
+      </div>
+
+      <div class="callout-interpret">
+        <h4>✍️ Modelo de Interpretação para Preencher na Prova:</h4>
+        <p>"A partir do gráfico de barras da distribuição de frequência da variável <strong>[NOME DA VARIÁVEL]</strong>, constata-se que a categoria predominante na amostra é <strong>[CATEGORIA MAIS FREQUENTE]</strong>, seguida por <strong>[SEGUNDA CATEGORIA]</strong>. Em contrapartida, as categorias com menor incidência observada foram <strong>[CATEGORIAS COM MENOR FREQUÊNCIA]</strong>, refletindo a distribuição da população analisada."</p>
+      </div>
+    </section>
+
+    <!-- ROTEIRO ADAPTÁVEL: OPERAÇÃO 2 -->
+    <section id="prova-q1b" class="card">
+      <h2>Op 2. Variável Qualitativa Bivariada (Tabela Cruzada & Barras 100%)</h2>
+      <p>Use quando a prova pedir: <em>"Realize a análise bivariada de duas variáveis qualitativas..."</em> (ex: raça e acesso à internet, gênero e cargo, etc.).</p>
+
+      <div class="callout-adapt">
+        <h4>⚠️ O QUE ALTERAR NO CÓDIGO ABAIXO:</h4>
+        <ul>
+          <li>Substitua <code>df</code> pelo nome do seu dataframe.</li>
+          <li>Substitua <code>'VARIAVEL_LINHA'</code> pela primeira categoria (ex: <code>'TP_COR_RACA'</code>).</li>
+          <li>Substitua <code>'VARIAVEL_COLUNA'</code> pela segunda categoria (ex: <code>'Q025'</code>).</li>
+          <li><strong>Não altere</strong>: <code>.unstack(1)</code>, <code>stack="normalize"</code>, <code>pivot.groupby(level=0)</code>.</li>
+        </ul>
+      </div>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Pandas & Altair - Bivariada Categórica Completa</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar Código</button>
+        </div>
+        <pre><code># 1. Tabela de dupla entrada com totais marginais
+tabela = df.groupby(['VARIAVEL_LINHA', 'VARIAVEL_COLUNA']).size().unstack(1)
+tabela.loc['Total', :] = tabela.sum(axis=0)
+tabela.loc[:, 'Total'] = tabela.sum(axis=1)
+display(tabela)
+
+# 2. Distribuição condicional percentual (proporção dentro de cada linha)
+pivot = pd.pivot_table(df, index=['VARIAVEL_LINHA', 'VARIAVEL_COLUNA'], aggfunc='size')
+dist_cond = (pivot / pivot.groupby(level=0).transform('sum') * 100)
+display(dist_cond)
+
+# 3. Gráfico de barras segmentadas 100% (o favorito da professora!)
+alt.Chart(pivot.reset_index().rename(columns={0: 'contagem'})).mark_bar().encode(
+    x=alt.X('contagem', stack="normalize", title="Proporção (100%)"),
+    y=alt.Y('VARIAVEL_LINHA:N', title="Variável Base"),
+    color=alt.Color('VARIAVEL_COLUNA:N', title="Variável Condicional")
+).properties(width=500, height=280)</code></pre>
+      </div>
+
+      <div class="callout-interpret">
+        <h4>✍️ Modelo de Interpretação para Preencher na Prova:</h4>
+        <p>"Por se tratarem de variáveis qualitativas, a análise bivariada foi realizada por meio de tabela de dupla entrada e distribuição condicional percentual. Observa-se que, no grupo de <strong>[GRUPO 1]</strong>, a proporção de <strong>[RESPOSTA FAVORÁVEL]</strong> atinge <strong>[X%]</strong>, enquanto entre <strong>[GRUPO 2]</strong> esse índice recua para <strong>[Y%]</strong>. Ao analisarmos a distribuição condicional inversa dos que pertencem à categoria vulnerável, verifica-se uma forte sobreposição sociodemográfica, evidenciando disparidades estruturais entre os grupos analisados."</p>
+      </div>
+    </section>
+
+    <!-- ROTEIRO ADAPTÁVEL: OPERAÇÃO 3 -->
+    <section id="prova-q2" class="card">
+      <h2>Op 3. Série Temporal e Agregação Mensal (INMET / Linha)</h2>
+      <p>Use quando a prova pedir: <em>"Escolha uma dessas variáveis para analisar sua série temporal..."</em></p>
+
+      <div class="callout-adapt">
+        <h4>⚠️ O QUE ALTERAR NO CÓDIGO ABAIXO:</h4>
+        <ul>
+          <li>Substitua <code>df</code> pelo nome do dataframe do clima ou série temporal.</li>
+          <li>Substitua <code>'COLUNA_DATA'</code> pelo nome da coluna de datas (ex: <code>'DATA (YYYY-MM-DD)'</code>).</li>
+          <li>Substitua <code>'VALOR_NUMERICO'</code> pela variável climática ou indicador (ex: <code>'temp_max'</code>, <code>'rain_max'</code>).</li>
+          <li><strong>Não altere</strong>: <code>pd.to_datetime</code>, <code>.resample('M')</code>, <code>x='DATA:T'</code>, <code>mark_line()</code>.</li>
+        </ul>
+      </div>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Python / Altair - Série Temporal e Resample Mensal</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar Código</button>
+        </div>
+        <pre><code># 1. Converter coluna para formato datetime
+df['DATA'] = pd.to_datetime(df['COLUNA_DATA'])
+
+# 2. Gráfico diário de evolução temporal
+alt.Chart(df).mark_line().encode(
+    x='DATA:T',
+    y='VALOR_NUMERICO:Q',
+    tooltip=['DATA:T', 'VALOR_NUMERICO:Q']
+).properties(height=300, width=800)
+
+# 3. Agregação mensal (média por mês via resample)
+df_idx = df.set_index('DATA')
+df_mensal = df_idx.resample('M')['VALOR_NUMERICO'].mean().reset_index()
+
+# 4. Gráfico da série agregada por mês
+alt.Chart(df_mensal).mark_line().encode(
+    x='DATA:T',
+    y=alt.Y('VALOR_NUMERICO:Q', title="Média Mensal")
+).properties(height=300, width=800)</code></pre>
+      </div>
+
+      <div class="callout-interpret">
+        <h4>✍️ Modelo de Interpretação para Preencher na Prova:</h4>
+        <p>"O gráfico temporal revela um evidente <strong>comportamento cíclico e sazonal</strong>. No decorrer dos anos analisados, os picos mais elevados de <strong>[NOME DA VARIÁVEL]</strong> concentram-se sistematicamente nos meses de <strong>[MESES DE PICO, ex: verão/início do ano]</strong>, enquanto os menores patamares ocorrem em <strong>[MESES DE BAIXA, ex: inverno/meio do ano]</strong>. A agregação mensal via resample é essencial porque suaviza as variações diárias ruidosas, tornando a tendência anual e a ciclicidade da série muito mais fáceis de identificar e interpretar."</p>
+      </div>
+    </section>
+
+    <!-- ROTEIRO ADAPTÁVEL: OPERAÇÃO 4 -->
+    <section id="prova-q3-p1" class="card">
+      <h2>Op 4. Pergunta Conceitual Teórica (Média vs Mediana / PNAD)</h2>
+      <p>Use quando a prova perguntar: <em>"O valor médio foi X e o mediano foi Y. O que essas informações dizem sobre a distribuição de frequência?"</em></p>
+
+      <div class="callout-adapt">
+        <h4>⚠️ O QUE OBSERVAR NA SUA PROVA:</h4>
+        <ul>
+          <li>Se a Média for MAIOR que a Mediana ➔ Distribuição <strong>assimétrica à direita</strong> (caso clássico de renda/salário).</li>
+          <li>Se a Média for MENOR que a Mediana ➔ Distribuição <strong>assimétrica à esquerda</strong>.</li>
+          <li>Se forem quase iguais ➔ Distribuição <strong>simétrica</strong>.</li>
+        </ul>
+      </div>
+
+      <div class="callout-interpret">
+        <h4>✍️ Resposta Literal Perfeita (Gabarito da Professora):</h4>
+        <p>"O fato de a média <strong>([VALOR DA MÉDIA])</strong> ser maior que a mediana <strong>([VALOR DA MEDIANA])</strong> aponta para um claro comportamento <strong>assimétrico à direita (positiva)</strong> da distribuição de frequência da variável. Isso quer dizer que existem poucas observações com valores excepcionalmente elevados que carregam a média em sua direção, já que a média é uma <strong>medida não resistente</strong>. A mediana, por sua vez, é resistente a outliers e representa com maior fidelidade o indivíduo típico. Esse cenário reforça a acentuada desigualdade presente no território, onde a grande maioria concentra valores mais baixos e poucos concentram valores muito elevados."</p>
+      </div>
+    </section>
+
+    <!-- ROTEIRO ADAPTÁVEL: OPERAÇÃO 5 -->
+    <section id="prova-q3-p2a" class="card">
+      <h2>Op 5. Variável Quantitativa Univariada (Histograma, Describe e AIQ)</h2>
+      <p>Use quando a prova pedir: <em>"Faça análises univariadas das variáveis quantitativas [ex: Renda per capita, Esperança de vida, Mortalidade infantil]..."</em></p>
+
+      <div class="callout-adapt">
+        <h4>⚠️ O QUE ALTERAR NO CÓDIGO ABAIXO:</h4>
+        <ul>
+          <li>Substitua <code>df</code> pelo nome do dataframe.</li>
+          <li>Substitua <code>'VARIAVEL_NUMERICA'</code> pelo nome da coluna (ex: <code>'Renda per capita 2010'</code>).</li>
+          <li>Ajuste o <code>step=100</code> no histograma para um passo razoável para a sua variável (ou remova o <code>step</code> e use apenas <code>bin=True</code>).</li>
+        </ul>
+      </div>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Python / Altair - Describe, AIQ e Histograma</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar Código</button>
+        </div>
+        <pre><code># 1. Estatísticas descritivas completas (Média, DP, Min, Q1, Mediana, Q3, Max)
+print(df['VARIAVEL_NUMERICA'].describe())
+
+# 2. Cálculo exato da Amplitude Interquartil (AIQ = Q3 - Q1)
+q1 = df['VARIAVEL_NUMERICA'].quantile(0.25)
+q3 = df['VARIAVEL_NUMERICA'].quantile(0.75)
+aiq = q3 - q1
+print(f"Q1 (25%): {q1:.2f} | Q3 (75%): {q3:.2f} | AIQ: {aiq:.2f}")
+
+# 3. Histograma com Altair
+alt.Chart(df).mark_bar().encode(
+    x=alt.X('VARIAVEL_NUMERICA:Q', bin=alt.Bin(step=100), title="Valor"),
+    y=alt.Y('count()', title="Número de Municípios / Observações")
+).properties(width=500, height=300)</code></pre>
+      </div>
+
+      <div class="callout-interpret">
+        <h4>✍️ Modelo de Interpretação para Preencher na Prova:</h4>
+        <p><strong>Se for Assimétrica à Direita (ex: Renda, Mortalidade):</strong><br>
+        "A distribuição apresenta formato <strong>assimétrico à direita</strong>, com concentração maciça das observações em valores mais baixos e poucos municípios com valores muito altos, arrastando a média <strong>([VALOR DA MÉDIA])</strong> para cima da mediana <strong>([VALOR DA MEDIANA])</strong>. A amplitude interquartil (AIQ = <strong>[VALOR DO AIQ]</strong>) demonstra que os 50% centrais dos dados concentram-se no intervalo entre <strong>[Q1]</strong> e <strong>[Q3]</strong>, enquanto os casos extremos alcançam até <strong>[VALOR MÁXIMO]</strong>, atestando profunda disparidade territorial."<br><br>
+        <strong>Se for Aproximadamente Simétrica (ex: Esperança de vida):</strong><br>
+        "A distribuição aproxima-se de uma forma <strong>simétrica</strong> em formato de sino. A média de <strong>[VALOR DA MÉDIA]</strong> é muito próxima da mediana <strong>([VALOR DA MEDIANA])</strong>, acompanhada de um desvio padrão reduzido (<strong>[VALOR DO DP]</strong>), o que indica que a grande maioria dos municípios encontra-se fortemente concentrada ao redor do valor central, sem evidenciar desequilíbrios extremos."</p>
+      </div>
+    </section>
+
+    <!-- ROTEIRO ADAPTÁVEL: OPERAÇÃO 6 -->
+    <section id="prova-q3-p2b" class="card">
+      <h2>Op 6. Análise Bivariada Quantitativa (Dispersão, Pearson e Outlier)</h2>
+      <p>Use quando a prova pedir: <em>"Realize uma análise bivariada de dois indicadores referentes à população... e avalie a presença de valores atípicos..."</em></p>
+
+      <div class="callout-adapt">
+        <h4>⚠️ O QUE ALTERAR NO CÓDIGO ABAIXO:</h4>
+        <ul>
+          <li>Substitua <code>df</code> pelo nome do dataframe.</li>
+          <li>Substitua <code>'VARIAVEL_X'</code> e <code>'VARIAVEL_Y'</code> pelos nomes das duas variáveis numéricas.</li>
+          <li>Substitua <code>'COLUNA_IDENTIFICADOR'</code> pela coluna que tem o nome do estado/cidade (ex: <code>'Territorialidades'</code> ou <code>'UF'</code>).</li>
+          <li>Substitua <code>'Distrito Federal'</code> pelo nome do outlier que aparecer isolado no seu gráfico.</li>
+        </ul>
+      </div>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Python / Altair - Dispersão e Correlação com/sem Outlier</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar Código</button>
+        </div>
+        <pre><code># 1. Gráfico de Dispersão (Scatter Plot)
+alt.Chart(df).mark_circle(size=70).encode(
+    x=alt.X('VARIAVEL_X:Q', title="Variável Explicativa (X)"),
+    y=alt.Y('VARIAVEL_Y:Q', title="Variável Resposta (Y)"),
+    tooltip=['COLUNA_IDENTIFICADOR', 'VARIAVEL_X', 'VARIAVEL_Y']
+).properties(width=500, height=350)
+
+# 2. Coeficiente de correlação de Pearson (todos os dados)
+corr_geral = df[['VARIAVEL_X', 'VARIAVEL_Y']].corr(numeric_only=True)
+print("Correlação de Pearson com todos os dados:")
+display(corr_geral)
+
+# 3. Recalcular a correlação SEM o valor atípico (Outlier)
+df_sem_outlier = df[df['COLUNA_IDENTIFICADOR'] != 'Distrito Federal']
+corr_sem_outlier = df_sem_outlier[['VARIAVEL_X', 'VARIAVEL_Y']].corr(numeric_only=True)
+print("\nCorrelação de Pearson SEM o outlier:")
+display(corr_sem_outlier)</code></pre>
+      </div>
+
+      <div class="callout-interpret">
+        <h4>✍️ Modelo de Interpretação para Preencher na Prova:</h4>
+        <p>"O diagrama de dispersão revela uma associação linear <strong>[POSITIVA OU NEGATIVA]</strong> e de intensidade <strong>[FORTE / MODERADA / FRACA]</strong> entre <strong>[VARIÁVEL X]</strong> e <strong>[VARIÁVEL Y]</strong>: à medida que a primeira se eleva, a segunda tende a <strong>[SUBIR OU DIMINUIR]</strong>. O coeficiente de correlação linear de Pearson obtido foi de <strong>r = [VALOR DO R GERAL]</strong>.<br><br>
+        Identifica-se visualmente no gráfico a presença de um claro <strong>valor atípico (outlier)</strong>: <strong>[NOME DO OUTLIER, ex: Distrito Federal]</strong>, cujos valores destoam expressivamente da tendência do grupo. Ao removermos esse outlier, o coeficiente de Pearson passou para <strong>r = [NOVO R]</strong>, tornando a associação linear ainda mais nítida. Esse resultado demonstra empiricamente que o coeficiente de Pearson é uma <strong>medida não resistente</strong>, sendo altamente suscetível a distorções causadas por pontos extremos."</p>
+      </div>
+    </section>
+
+    <!-- ROTEIRO ADAPTÁVEL: OPERAÇÃO 7 -->
+    <section id="prova-q3-p2c" class="card">
+      <h2>Op 7. Boxplots Comparativos Lado a Lado (Regra 1.5×AIQ)</h2>
+      <p>Use quando a prova pedir: <em>"Escolha uma variável para comparar suas distribuições considerando a desagregação de homens e mulheres (ou brancos e negros) utilizando boxplots lado a lado e regra 1.5xAIQ..."</em></p>
+
+      <div class="callout-adapt">
+        <h4>⚠️ O QUE ALTERAR NO CÓDIGO ABAIXO:</h4>
+        <ul>
+          <li>Substitua <code>df</code> pelo nome do dataframe.</li>
+          <li>Em <code>value_vars</code>, coloque os nomes exatos das duas colunas que você quer comparar lado a lado (ex: coluna de homens e coluna de mulheres).</li>
+          <li>Substitua <code>'Territorialidades'</code> pela coluna de identificação (estado ou cidade).</li>
+          <li><strong>Não altere</strong>: <code>extent=1.5</code> (é isso que ativa a regra de Tukey do 1.5xAIQ para desenhar os pontos de outliers!).</li>
+        </ul>
+      </div>
+
+      <div class="code-container">
+        <div class="code-header">
+          <span>Python / Altair - Melt e Boxplot Comparativo</span>
+          <button class="copy-btn" onclick="copyCode(this)">Copiar Código</button>
+        </div>
+        <pre><code># 1. Transformar as duas colunas para o formato longo (melt)
+melted = df.melt(
+    id_vars=['Territorialidades'],
+    value_vars=['COLUNA_GRUPO_1', 'COLUNA_GRUPO_2'],
+    var_name='Grupo',
+    value_name='Valor'
+)
+
+# 2. Boxplot comparativo com regra 1.5xAIQ (extent=1.5)
+alt.Chart(melted).mark_boxplot(extent=1.5, size=40).encode(
+    x=alt.X("Valor:Q", title="Valor do Indicador"),
+    y=alt.Y("Grupo:N", title="Grupo Comparado"),
+    tooltip=['Territorialidades', 'Valor']
+).properties(height=200, width=600)</code></pre>
+      </div>
+
+      <div class="callout-interpret">
+        <h4>✍️ Modelo de Interpretação para Preencher na Prova:</h4>
+        <p><strong>Comparação de Gênero ou Raça:</strong><br>
+        "A análise comparativa dos diagramas de caixa (boxplots) revela que a mediana do grupo <strong>[GRUPO COM MEDIANA MAIOR]</strong> é superior à do grupo <strong>[GRUPO COM MEDIANA MENOR]</strong>, demonstrando que o valor típico desse indicador é mais elevado para o primeiro grupo.<br><br>
+        Ao avaliarmos a dispersão central dada pela amplitude interquartil (largura da caixa, AIQ = Q3 - Q1), observa-se que o grupo <strong>[GRUPO COM CAIXA MAIOR]</strong> apresenta maior variabilidade interna dos seus 50% centrais. Pela regra de <strong>1.5×AIQ</strong> (<code>extent=1.5</code>), identificam-se valores atípicos (outliers) representados pelos pontos individuais além dos bigodes, correspondentes a <strong>[NOME DO CASO, ex: Distrito Federal]</strong>, reforçando as disparidades estruturais evidenciadas pela desagregação dos dados."</p>
+      </div>
+    </section>
+
+    <!-- CHECKLIST -->
+    <section id="checklist" class="card">
+      <h2>✅ Checklist de Envio no Google Colab</h2>
+      <ol>
+        <li><strong>Estrutura Exigida</strong>: Abaixo de cada célula com título "Resposta", crie a célula de código (`+ Código`) para rodar os dados e gerar o gráfico, e imediatamente abaixo crie a célula de texto (`+ Texto`) com a interpretação preenchida.</li>
+        <li><strong>Instrução 7 da Prova</strong>: Qualquer questão em branco é considerada zerada. Se não conseguir gerar o gráfico de jeito nenhum, calcule o describe e escreva a interpretação teórica!</li>
+        <li><strong>Salvando o Arquivo</strong>:
+          <ul>
+            <li>No menu superior do Colab: <strong>Arquivo</strong> ➔ <strong>Fazer Download</strong> ➔ <strong>Baixar o .ipynb</strong>.</li>
+            <li>Abra o arquivo baixado ou confira se o tamanho está com alguns megabytes para ter certeza de que os gráficos gerados foram salvos nele antes de anexar no Teams.</li>
+          </ul>
+        </li>
+      </ol>
+    </section>
+
+  </main>
+
+  <script>
+    function copyCode(btn) {
+      const container = btn.closest('.code-container');
+      const code = container.querySelector('code').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        const originalText = btn.innerText;
+        btn.innerText = '✓ Copiado!';
+        btn.classList.add('copied');
+        setTimeout(() => {
+          btn.innerText = originalText;
+          btn.classList.remove('copied');
+        }, 2000);
+      });
+    }
+
+    function filterContent() {
+      const query = document.getElementById('search').value.toLowerCase();
+      const cards = document.querySelectorAll('.card');
+      cards.forEach(card => {
+        const text = card.innerText.toLowerCase();
+        if (text.includes(query)) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    }
+  </script>
+</body>
+</html>
