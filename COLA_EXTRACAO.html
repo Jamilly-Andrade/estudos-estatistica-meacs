@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Folha de Cola — Extração e Análise de Dados · FGV</title>
+  <style>
+    :root {
+      --bg: #0b1120;
+      --sidebar-bg: #070d19;
+      --card-bg: #151f32;
+      --card-border: #1e3050;
+      --text: #e8edf5;
+      --text-muted: #7a90b0;
+      --primary: #38bdf8;
+      --accent: #a78bfa;
+      --success: #34d399;
+      --warning: #fbbf24;
+      --danger: #f87171;
+      --code-bg: #060e1c;
+      --tag-bg: rgba(56,189,248,0.12);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.65;
+      display: flex;
+    }
+    /* SIDEBAR */
+    nav {
+      width: 290px;
+      min-height: 100vh;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      background: var(--sidebar-bg);
+      border-right: 1px solid var(--card-border);
+      padding: 20px 14px;
+      overflow-y: auto;
+      flex-shrink: 0;
+      font-size: 0.82rem;
+    }
+    nav h2 { color: var(--primary); font-size: 0.95rem; margin-bottom: 2px; }
+    nav p.sub { color: var(--text-muted); font-size: 0.72rem; margin-bottom: 16px; }
+    nav input {
+      width: 100%; padding: 8px 10px;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      border-radius: 6px; color: var(--text); font-size: 0.8rem;
+      margin-bottom: 14px; outline: none;
+    }
+    nav input:focus { border-color: var(--primary); }
+    nav ul { list-style: none; }
+    nav ul li a {
+      display: block; padding: 5px 8px; border-radius: 5px;
+      color: var(--text-muted); text-decoration: none; transition: all .15s;
+      font-size: 0.8rem;
+    }
+    nav ul li a:hover { background: var(--card-bg); color: var(--primary); }
+    nav ul li a.active { background: var(--tag-bg); color: var(--primary); font-weight: 600; }
+    nav .section-label {
+      font-size: 0.67rem; text-transform: uppercase; letter-spacing: .08em;
+      color: var(--text-muted); margin: 14px 0 4px 8px;
+    }
+    nav .badge {
+      float: right; background: var(--danger); color: #fff;
+      font-size: 0.6rem; padding: 1px 5px; border-radius: 10px; font-weight: 700;
+    }
+    nav .badge.warn { background: var(--warning); color: #000; }
+    nav .badge.ok { background: var(--success); color: #000; }
+    /* MAIN */
+    main { flex: 1; padding: 32px 40px; max-width: 900px; }
+    section { margin-bottom: 60px; scroll-margin-top: 24px; }
+    h1.page-title {
+      font-size: 1.6rem; font-weight: 700; color: var(--primary);
+      margin-bottom: 4px;
+    }
+    p.page-sub { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 32px; }
+    h2.sec {
+      font-size: 1.15rem; color: var(--primary);
+      border-bottom: 1px solid var(--card-border);
+      padding-bottom: 8px; margin-bottom: 20px; display: flex; align-items: center; gap: 10px;
+    }
+    h2.sec .icon { font-size: 1.2rem; }
+    h3.sub { font-size: 0.95rem; color: var(--accent); margin: 20px 0 8px; }
+    p { margin-bottom: 10px; font-size: 0.9rem; color: #c8d5e8; }
+    /* CARDS */
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-bottom: 14px;
+    }
+    .card-title {
+      font-size: 0.8rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: var(--text-muted); margin-bottom: 10px;
+    }
+    /* CODE */
+    .code-block {
+      background: var(--code-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-family: "JetBrains Mono","Fira Code","Courier New", monospace;
+      font-size: 0.8rem;
+      line-height: 1.7;
+      white-space: pre;
+      overflow-x: auto;
+      position: relative;
+      margin-bottom: 12px;
+      color: #c8d5e8;
+    }
+    .copy-btn {
+      position: absolute; top: 8px; right: 10px;
+      background: var(--card-bg); border: 1px solid var(--card-border);
+      color: var(--text-muted); font-size: 0.7rem; padding: 3px 10px;
+      border-radius: 5px; cursor: pointer; transition: all .15s;
+    }
+    .copy-btn:hover { background: var(--primary); color: #000; border-color: var(--primary); }
+    .copy-btn.done { background: var(--success); color: #000; }
+    /* SYNTAX HIGHLIGHT */
+    .kw { color: #c084fc; }
+    .fn { color: #38bdf8; }
+    .st { color: #34d399; }
+    .cm { color: #4a6080; font-style: italic; }
+    .nu { color: #fbbf24; }
+    /* TABLES */
+    table { width: 100%; border-collapse: collapse; font-size: 0.83rem; margin-bottom: 14px; }
+    th { background: var(--card-bg); color: var(--primary); padding: 7px 12px; text-align: left; border-bottom: 2px solid var(--card-border); }
+    td { padding: 6px 12px; border-bottom: 1px solid var(--card-border); color: #c8d5e8; vertical-align: top; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: rgba(56,189,248,0.04); }
+    /* TAGS */
+    .tag {
+      display: inline-block; padding: 2px 9px; border-radius: 12px;
+      font-size: 0.7rem; font-weight: 600; margin: 2px 3px 2px 0;
+    }
+    .tag-blue { background: rgba(56,189,248,0.15); color: #38bdf8; }
+    .tag-purple { background: rgba(167,139,250,0.15); color: #a78bfa; }
+    .tag-green { background: rgba(52,211,153,0.15); color: #34d399; }
+    .tag-yellow { background: rgba(251,191,36,0.15); color: #fbbf24; }
+    .tag-red { background: rgba(248,113,113,0.15); color: #f87171; }
+    /* ALERT BOXES */
+    .alert {
+      border-left: 3px solid; border-radius: 0 8px 8px 0;
+      padding: 10px 14px; margin-bottom: 14px; font-size: 0.85rem;
+    }
+    .alert-danger { border-color: var(--danger); background: rgba(248,113,113,0.07); color: #f87171; }
+    .alert-warning { border-color: var(--warning); background: rgba(251,191,36,0.07); color: #fbbf24; }
+    .alert-success { border-color: var(--success); background: rgba(52,211,153,0.07); color: #34d399; }
+    .alert-info { border-color: var(--primary); background: rgba(56,189,248,0.07); color: #38bdf8; }
+    /* STEPS */
+    .steps { counter-reset: step; padding-left: 0; list-style: none; }
+    .steps li {
+      counter-increment: step;
+      display: flex; gap: 12px; align-items: flex-start;
+      margin-bottom: 10px; font-size: 0.88rem;
+    }
+    .steps li::before {
+      content: counter(step);
+      min-width: 24px; height: 24px;
+      background: var(--primary); color: #000;
+      border-radius: 50%; font-weight: 700; font-size: 0.75rem;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 2px;
+    }
+    /* GRID 2 cols */
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    @media(max-width:700px){ .grid2 { grid-template-columns: 1fr; } }
+    code { background: var(--code-bg); padding: 1px 5px; border-radius: 3px; font-size: 0.8rem; color: var(--success); font-family: monospace; }
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-thumb { background: #1e3050; border-radius: 3px; }
+  </style>
+</head>
+<body>
+
+<nav id="sidebar">
+  <h2>🐍 Cola — Extração & Análise</h2>
+  <p class="sub">Prof. Pestana · FGV 2026.2 · A1</p>
+  <input type="text" id="search" placeholder="🔍 Buscar..." oninput="filterNav(this.value)">
+
+  <div class="section-label">INÍCIO DA PROVA</div>
+  <ul>
+    <li><a href="#inicio">🚀 Setup obrigatório</a></li>
+    <li><a href="#ler-csv">📂 Ler arquivo CSV</a></li>
+  </ul>
+
+  <div class="section-label">O QUE CAI — SIMULADO</div>
+  <ul>
+    <li><a href="#q1">Q1 Diagnóstico inicial <span class="badge warn">sempre</span></a></li>
+    <li><a href="#q2">Q2 Limpeza da base <span class="badge warn">sempre</span></a></li>
+    <li><a href="#q3">Q3 Métricas &amp; exploração</a></li>
+    <li><a href="#q4">Q4 Hashtags / explode</a></li>
+    <li><a href="#q5">Q5 Visualização matplotlib</a></li>
+    <li><a href="#q6">Q6 Segmentação / cluster</a></li>
+    <li><a href="#q7">Q7 Regressão</a></li>
+    <li><a href="#q8">Q8 Classificação <span class="badge warn">sempre</span></a></li>
+  </ul>
+
+  <div class="section-label">REFERÊNCIA RÁPIDA</div>
+  <ul>
+    <li><a href="#pandas-ref">🐼 Pandas — comandos</a></li>
+    <li><a href="#matplotlib-ref">📊 Matplotlib — gráficos</a></li>
+    <li><a href="#sklearn-ref">🤖 scikit-learn — ML</a></li>
+    <li><a href="#regras">⚠️ Regras do professor</a></li>
+    <li><a href="#emergencia">🆘 Emergência</a></li>
+  </ul>
+</nav>
+
+<main>
+  <h1 class="page-title">Folha de Cola — Extração &amp; Análise de Dados</h1>
+  <p class="page-sub">Prof. Pestana · FGV 2026.2 · Prova A1 · <strong style="color:var(--warning)">Prova hoje às 10:30</strong></p>
+
+  <div class="alert alert-danger">
+    <strong>⚠️ PROIBIDO na prova:</strong> IA (ChatGPT, Gemini, Claude). Pode: GitHub, DuckDuckGo NoAI, docs oficiais pandas/matplotlib/sklearn, Stack Overflow, YouTube.
+  </div>
+  <div class="alert alert-info">
+    <strong>📋 Formato:</strong> 8 questões independentes. Base de publicações de redes sociais. Cada questão carrega o arquivo; não dependa de variáveis de outra questão.
+  </div>
+
+  <!-- ===== SETUP ===== -->
+  <section id="inicio">
+    <h2 class="sec"><span class="icon">🚀</span> Setup — rode isso primeiro</h2>
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button><span class="cm"># Cole e execute no início da prova</span>
+<span class="kw">import</span> pandas <span class="kw">as</span> pd
+<span class="kw">import</span> matplotlib.pyplot <span class="kw">as</span> plt
+<span class="kw">import</span> numpy <span class="kw">as</span> np
+<span class="kw">from</span> sklearn.model_selection <span class="kw">import</span> train_test_split
+<span class="kw">from</span> sklearn.linear_model <span class="kw">import</span> LinearRegression, LogisticRegression
+<span class="kw">from</span> sklearn.tree <span class="kw">import</span> DecisionTreeClassifier, DecisionTreeRegressor
+<span class="kw">from</span> sklearn.ensemble <span class="kw">import</span> RandomForestClassifier
+<span class="kw">from</span> sklearn.preprocessing <span class="kw">import</span> StandardScaler
+<span class="kw">from</span> sklearn.cluster <span class="kw">import</span> KMeans
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> (
+    confusion_matrix, accuracy_score,
+    precision_score, recall_score, f1_score,
+    mean_absolute_error, r2_score
+)
+<span class="kw">from</span> sklearn.metrics <span class="kw">import</span> silhouette_score
+
+pd.options.display.max_columns = <span class="nu">100</span></div>
+  </section>
+
+  <!-- ===== LER CSV ===== -->
+  <section id="ler-csv">
+    <h2 class="sec"><span class="icon">📂</span> Ler arquivo CSV</h2>
+    <div class="grid2">
+      <div>
+        <div class="card-title">CSV com vírgula (padrão)</div>
+        <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>df = pd.read_csv(<span class="st">"dados/publicacoes_brutas.csv"</span>)
+df.head()</div>
+      </div>
+      <div>
+        <div class="card-title">CSV com ponto-e-vírgula</div>
+        <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>df = pd.read_csv(<span class="st">"dados/arquivo.csv"</span>, sep=<span class="st">";"</span>)
+df.head()</div>
+      </div>
+    </div>
+    <div class="alert alert-warning">
+      <strong>Dica:</strong> O arquivo da prova vai estar em <code>dados/</code>. Use o caminho relativo exato como mostrado na célula de setup da prova.
+    </div>
+  </section>
+
+  <!-- ===== Q1 DIAGNOSTICO ===== -->
+  <section id="q1">
+    <h2 class="sec"><span class="icon">🔍</span> Q1 — Diagnóstico inicial da base</h2>
+    <p>Questão sempre presente. Pede: 5 primeiras linhas + dimensões + valores ausentes por coluna.</p>
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>df = pd.read_csv(<span class="st">"dados/publicacoes_brutas.csv"</span>)
+
+<span class="cm"># 5 primeiras linhas</span>
+df.head()
+
+<span class="cm"># Dimensões (linhas, colunas)</span>
+<span class="fn">print</span>(df.shape)
+
+<span class="cm"># Tipos de cada coluna</span>
+<span class="fn">print</span>(df.dtypes)
+
+<span class="cm"># Valores ausentes — só colunas que têm ausência</span>
+ausentes = df.isna().sum()
+<span class="fn">print</span>(ausentes[ausentes > <span class="nu">0</span>])
+
+<span class="cm"># Duplicatas</span>
+<span class="fn">print</span>(<span class="st">"Duplicatas:"</span>, df.duplicated().sum())</div>
+
+    <h3 class="sub">Resposta markdown modelo — limitação</h3>
+    <div class="card">
+      <p style="color:#c8d5e8; font-size:0.88rem;">"A base representa apenas publicações de uma equipe específica nas últimas oito semanas, sem amostragem representativa. Os resultados não podem ser generalizados para outras contas, redes sociais ou públicos."</p>
+    </div>
+  </section>
+
+  <!-- ===== Q2 LIMPEZA ===== -->
+  <section id="q2">
+    <h2 class="sec"><span class="icon">🧹</span> Q2 — Limpeza e tratamento da base</h2>
+    <p>Pede: remover duplicata por id, padronizar texto, converter datas, converter números, tratar ausentes.</p>
+
+    <div class="alert alert-danger">
+      <strong>NUNCA</strong> altere o DataFrame bruto. Sempre <code>df_limpo = df.copy()</code> antes de qualquer limpeza.
+    </div>
+
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>df_bruto = pd.read_csv(<span class="st">"dados/publicacoes_brutas.csv"</span>)
+df = df_bruto.copy()  <span class="cm"># SEMPRE copiar primeiro</span>
+
+<span class="cm"># 1. Remover duplicatas por id_publicacao</span>
+df = df.drop_duplicates(subset=[<span class="st">"id_publicacao"</span>])
+<span class="cm"># ou sem subset para remover linhas completamente idênticas:</span>
+df = df.drop_duplicates()
+
+<span class="cm"># 2. Padronizar texto (tema, formato, tipo...)</span>
+df[<span class="st">"tema"</span>] = df[<span class="st">"tema"</span>].str.strip().str.lower().str.title()
+<span class="cm"># ex: "  cultura " → "Cultura"</span>
+
+<span class="cm"># 3. Converter datas</span>
+df[<span class="st">"data_publicacao"</span>] = pd.to_datetime(df[<span class="st">"data_publicacao"</span>], dayfirst=<span class="kw">True</span>, errors=<span class="st">"coerce"</span>)
+<span class="cm"># errors="coerce" → datas inválidas viram NaT (não travam o código)</span>
+
+<span class="cm"># 4. Converter número disfarçado de texto</span>
+df[<span class="st">"alcance"</span>] = pd.to_numeric(df[<span class="st">"alcance"</span>], errors=<span class="st">"coerce"</span>)
+<span class="cm"># errors="coerce" → texto inválido vira NaN</span>
+
+<span class="cm"># 5. Tratar ausentes (escolha uma das opções abaixo)</span>
+df = df.dropna(subset=[<span class="st">"id_publicacao"</span>])        <span class="cm"># remove linha se campo obrigatório vazio</span>
+df[<span class="st">"alcance"</span>] = df[<span class="st">"alcance"</span>].fillna(<span class="nu">0</span>)          <span class="cm"># preenche número ausente com 0</span>
+df[<span class="st">"formato"</span>] = df[<span class="st">"formato"</span>].fillna(<span class="st">"desconhecido"</span>) <span class="cm"># preenche texto ausente</span>
+
+<span class="fn">print</span>(<span class="st">"Linhas depois da limpeza:"</span>, len(df))</div>
+
+    <h3 class="sub">Referência rápida de limpeza de texto</h3>
+    <table>
+      <tr><th>Comando</th><th>O que faz</th><th>Exemplo</th></tr>
+      <tr><td><code>.str.strip()</code></td><td>Remove espaços do início/fim</td><td><code>"  Cultura " → "Cultura"</code></td></tr>
+      <tr><td><code>.str.lower()</code></td><td>Tudo minúsculo</td><td><code>"CULTURA" → "cultura"</code></td></tr>
+      <tr><td><code>.str.upper()</code></td><td>Tudo maiúsculo</td><td><code>"cultura" → "CULTURA"</code></td></tr>
+      <tr><td><code>.str.title()</code></td><td>Primeira letra de cada palavra</td><td><code>"cultura local" → "Cultura Local"</code></td></tr>
+      <tr><td><code>.str.replace("£","",regex=False)</code></td><td>Remove trecho específico</td><td><code>"£12.50" → "12.50"</code></td></tr>
+    </table>
+  </section>
+
+  <!-- ===== Q3 METRICAS ===== -->
+  <section id="q3">
+    <h2 class="sec"><span class="icon">📈</span> Q3 — Métricas e exploração</h2>
+    <p>Pede estatísticas descritivas, calcular taxa de engajamento, agrupar por categoria.</p>
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>df = pd.read_csv(<span class="st">"dados/publicacoes_analise.csv"</span>)
+
+<span class="cm"># Estatísticas descritivas</span>
+df[[<span class="st">"alcance"</span>, <span class="st">"curtidas"</span>, <span class="st">"comentarios"</span>]].describe()
+
+<span class="cm"># Criar taxa de engajamento</span>
+df[<span class="st">"taxa_eng"</span>] = (df[<span class="st">"curtidas"</span>] + df[<span class="st">"comentarios"</span>]) / (df[<span class="st">"alcance"</span>] + <span class="nu">1</span>)
+
+<span class="cm"># Agrupar por tema — resumo por grupo</span>
+resumo = df.groupby(<span class="st">"tema"</span>).agg(
+    total_posts=(<span class="st">"curtidas"</span>, <span class="st">"count"</span>),
+    media_alcance=(<span class="st">"alcance"</span>, <span class="st">"mean"</span>),
+    media_eng=(<span class="st">"taxa_eng"</span>, <span class="st">"mean"</span>),
+    total_curtidas=(<span class="st">"curtidas"</span>, <span class="st">"sum"</span>)
+).reset_index()
+resumo[<span class="st">"media_eng"</span>] = resumo[<span class="st">"media_eng"</span>].round(<span class="nu">4</span>)
+resumo.sort_values(<span class="st">"media_eng"</span>, ascending=<span class="kw">False</span>)</div>
+  </section>
+
+  <!-- ===== Q4 HASHTAGS ===== -->
+  <section id="q4">
+    <h2 class="sec"><span class="icon">#️⃣</span> Q4 — Hashtags (explode)</h2>
+    <p>Padrão fixo: <code>dropna → str.split → explode → str.strip → value_counts/groupby</code></p>
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button"><span class="cm"># PADRÃO COMPLETO — sempre nessa ordem</span>
+df_h = df.dropna(subset=[<span class="st">"hashtags"</span>]).copy()       <span class="cm"># 1. remove ausentes</span>
+df_h = df_h[df_h[<span class="st">"hashtags"</span>] != <span class="st">""</span>]               <span class="cm"># 2. remove vazio</span>
+df_h[<span class="st">"hashtags"</span>] = df_h[<span class="st">"hashtags"</span>].str.split(<span class="st">","</span>) <span class="cm"># 3. string → lista</span>
+df_h = df_h.explode(<span class="st">"hashtags"</span>)                    <span class="cm"># 4. cada item → linha</span>
+df_h[<span class="st">"hashtags"</span>] = df_h[<span class="st">"hashtags"</span>].str.strip()    <span class="cm"># 5. remove espaços</span>
+
+<span class="cm"># Contar frequência</span>
+<span class="fn">print</span>(df_h[<span class="st">"hashtags"</span>].value_counts().head(<span class="nu">10</span>))
+
+<span class="cm"># Tabela-resumo por hashtag com engajamento médio</span>
+tab = df_h.groupby(<span class="st">"hashtags"</span>).agg(
+    total=(<span class="st">"curtidas"</span>, <span class="st">"count"</span>),
+    eng_medio=(<span class="st">"taxa_eng"</span>, <span class="st">"mean"</span>)
+).reset_index().sort_values(<span class="st">"total"</span>, ascending=<span class="kw">False</span>)
+tab.head(<span class="nu">10</span>)</div>
+  </section>
+
+  <!-- ===== Q5 VISUALIZACAO ===== -->
+  <section id="q5">
+    <h2 class="sec"><span class="icon">📊</span> Q5 — Visualização com Matplotlib</h2>
+    <p>Sempre: <code>fig, ax = plt.subplots()</code> → tipo → título + rótulos + fonte → <code>plt.show()</code></p>
+
+    <h3 class="sub">Gráfico de barras</h3>
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>top10 = tab.head(<span class="nu">10</span>)
+
+fig, ax = plt.subplots(figsize=(<span class="nu">10</span>, <span class="nu">5</span>))
+
+ax.bar(top10[<span class="st">"hashtags"</span>], top10[<span class="st">"total"</span>], color=<span class="st">"#3b6ea5"</span>)
+
+ax.set_title(<span class="st">"Top 10 hashtags por frequência de publicação"</span>)
+ax.set_xlabel(<span class="st">"Hashtag"</span>)
+ax.set_ylabel(<span class="st">"Total de publicações"</span>)
+ax.tick_params(axis=<span class="st">"x"</span>, rotation=<span class="nu">45</span>)
+fig.text(<span class="nu">0.01</span>, <span class="nu">-0.04</span>, <span class="st">"Fonte: dados/publicacoes_analise.csv"</span>, fontsize=<span class="nu">8</span>, color=<span class="st">"gray"</span>)
+
+fig.tight_layout()
+plt.show()</div>
+
+    <h3 class="sub">Gráfico de linha (série temporal)</h3>
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button">df[<span class="st">"data_publicacao"</span>] = pd.to_datetime(df[<span class="st">"data_publicacao"</span>])
+por_dia = df.groupby(df[<span class="st">"data_publicacao"</span>].dt.date)[<span class="st">"alcance"</span>].mean()
+
+fig, ax = plt.subplots(figsize=(<span class="nu">11</span>, <span class="nu">4</span>))
+
+ax.plot(por_dia.index, por_dia.values, marker=<span class="st">"o"</span>, color=<span class="st">"#e07b39"</span>)
+
+ax.set_title(<span class="st">"Alcance médio por data de publicação"</span>)
+ax.set_xlabel(<span class="st">"Data"</span>)
+ax.set_ylabel(<span class="st">"Alcance médio"</span>)
+ax.tick_params(axis=<span class="st">"x"</span>, rotation=<span class="nu">45</span>)
+fig.text(<span class="nu">0.01</span>, <span class="nu">-0.06</span>, <span class="st">"Fonte: dados/publicacoes_analise.csv"</span>, fontsize=<span class="nu">8</span>, color=<span class="st">"gray"</span>)
+
+fig.tight_layout()
+plt.show()</div>
+
+    <h3 class="sub">Gráfico de dispersão</h3>
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button>fig, ax = plt.subplots(figsize=(<span class="nu">7</span>, <span class="nu">5</span>))
+
+ax.scatter(df[<span class="st">"alcance"</span>], df[<span class="st">"curtidas"</span>], alpha=<span class="nu">0.5</span>, color=<span class="st">"#5b9a5e"</span>)
+
+ax.set_title(<span class="st">"Curtidas × Alcance das publicações"</span>)
+ax.set_xlabel(<span class="st">"Alcance (visualizações)"</span>)
+ax.set_ylabel(<span class="st">"Curtidas"</span>)
+fig.text(<span class="nu">0.01</span>, <span class="nu">-0.04</span>, <span class="st">"Fonte: dados/publicacoes_analise.csv"</span>, fontsize=<span class="nu">8</span>, color=<span class="st">"gray"</span>)
+
+fig.tight_layout()
+plt.show()</div>
+
+    <table>
+      <tr><th>Tipo</th><th>Quando usar</th><th>Comando</th></tr>
+      <tr><td><span class="tag tag-blue">Barras</span></td><td>Comparar categorias (tema, formato)</td><td><code>ax.bar(x, y)</code></td></tr>
+      <tr><td><span class="tag tag-green">Linha</span></td><td>Evolução no tempo</td><td><code>ax.plot(x, y, marker="o")</code></td></tr>
+      <tr><td><span class="tag tag-purple">Dispersão</span></td><td>Relação entre 2 variáveis numéricas</td><td><code>ax.scatter(x, y, alpha=0.5)</code></td></tr>
+    </table>
+  </section>
+
+  <!-- ===== Q6 CLUSTER ===== -->
+  <section id="q6">
+    <h2 class="sec"><span class="icon">🔵</span> Q6 — Segmentação / Clusterização KMeans</h2>
+    <p>Agrupa publicações por características numéricas. Sequência: selecionar → padronizar → cotovelo+silhueta → fit_predict → interpretar.</p>
+
+    <div class="alert alert-danger">
+      <strong>SEMPRE padronize antes do KMeans.</strong> Sem <code>StandardScaler</code>, a coluna com maior escala domina tudo.
+    </div>
+
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button"><span class="cm"># 1. Selecionar features numéricas</span>
+cols = [<span class="st">"alcance"</span>, <span class="st">"curtidas"</span>, <span class="st">"comentarios"</span>, <span class="st">"taxa_eng"</span>]
+X = df[cols].dropna()
+
+<span class="cm"># 2. Padronizar (média 0, desvio 1)</span>
+X_pad = StandardScaler().fit_transform(X)
+
+<span class="cm"># 3. Curva do cotovelo + silhueta para escolher k</span>
+inercias, silhuetas = [], []
+<span class="kw">for</span> k <span class="kw">in</span> range(<span class="nu">2</span>, <span class="nu">8</span>):
+    km = KMeans(n_clusters=k, n_init=<span class="nu">10</span>, random_state=<span class="nu">42</span>)
+    lbs = km.fit_predict(X_pad)
+    inercias.append(km.inertia_)
+    silhuetas.append(silhouette_score(X_pad, lbs))
+    <span class="fn">print</span>(f<span class="st">"k={k} | inércia={km.inertia_:.0f} | silhueta={silhouette_score(X_pad, lbs):.3f}"</span>)
+
+<span class="cm"># 4. Aplicar com k escolhido</span>
+k_final = <span class="nu">3</span>  <span class="cm"># troca pelo k do cotovelo/silhueta</span>
+kmeans = KMeans(n_clusters=k_final, n_init=<span class="nu">10</span>, random_state=<span class="nu">42</span>)
+df_cl = df.loc[X.index].copy()
+df_cl[<span class="st">"cluster"</span>] = kmeans.fit_predict(X_pad)
+
+<span class="cm"># 5. Perfil médio de cada grupo → para nomear</span>
+<span class="fn">print</span>(df_cl.groupby(<span class="st">"cluster"</span>)[cols].mean().round(<span class="nu">2</span>))
+
+<span class="cm"># 6. Dar nomes com base no perfil</span>
+df_cl[<span class="st">"perfil"</span>] = df_cl[<span class="st">"cluster"</span>].map({
+    <span class="nu">0</span>: <span class="st">"Alto alcance, baixo eng."</span>,
+    <span class="nu">1</span>: <span class="st">"Baixo alcance, alto eng."</span>,
+    <span class="nu">2</span>: <span class="st">"Médio desempenho"</span>
+})</div>
+
+    <h3 class="sub">Silhueta — interpretação</h3>
+    <table>
+      <tr><th>Valor</th><th>O que significa</th></tr>
+      <tr><td><span class="tag tag-green">&gt; 0.7</span></td><td>Grupos muito bem separados</td></tr>
+      <tr><td><span class="tag tag-yellow">0.5 – 0.7</span></td><td>Razoavelmente separados</td></tr>
+      <tr><td><span class="tag tag-red">0.3 – 0.5</span></td><td>Estrutura fraca</td></tr>
+      <tr><td><span class="tag tag-red">&lt; 0.3</span></td><td>Sem estrutura clara</td></tr>
+    </table>
+  </section>
+
+  <!-- ===== Q7 REGRESSAO ===== -->
+  <section id="q7">
+    <h2 class="sec"><span class="icon">📉</span> Q7 — Regressão</h2>
+    <p>Prever um <strong>número</strong> (ex: alcance, taxa de engajamento). Esqueleto: X e y → split → bobo → treinar → MAE/R².</p>
+
+    <div class="alert alert-danger">
+      <strong>Vazamento:</strong> NUNCA coloque o alvo <code>y</code> (nem nada calculado a partir dele) dentro do <code>X</code>.
+    </div>
+
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button"><span class="cm"># ALVO — o que o modelo vai prever</span>
+y = df[<span class="st">"alcance"</span>]   <span class="cm"># troca pelo alvo pedido</span>
+
+<span class="cm"># FEATURES — o que o modelo usa para prever (NUNCA o alvo aqui!)</span>
+X = pd.DataFrame(index=df.index)
+X[<span class="st">"tamanho_legenda"</span>] = df[<span class="st">"legenda"</span>].fillna(<span class="st">""</span>).str.len()
+X[<span class="st">"num_hashtags"</span>]   = df[<span class="st">"hashtags"</span>].fillna(<span class="st">""</span>).apply(
+    <span class="kw">lambda</span> s: <span class="nu">0</span> <span class="kw">if</span> s == <span class="st">""</span> <span class="kw">else</span> len(s.split(<span class="st">","</span>))
+)
+X[<span class="st">"hora"</span>] = pd.to_datetime(df[<span class="st">"data_publicacao"</span>]).dt.hour
+<span class="cm"># categoria → dummy (0 ou 1)</span>
+X = pd.get_dummies(X.join(df[[<span class="st">"tema"</span>]]), columns=[<span class="st">"tema"</span>], drop_first=<span class="kw">True</span>)
+
+<span class="cm"># SPLIT</span>
+X_tr, X_te, y_tr, y_te = train_test_split(X, y, test_size=<span class="nu">0.25</span>, random_state=<span class="nu">42</span>)
+
+<span class="cm"># MODELO BOBO — referência mínima</span>
+bobo = np.full(len(y_te), y_tr.mean())
+<span class="fn">print</span>(f<span class="st">"Bobo — MAE: {mean_absolute_error(y_te, bobo):.2f} | R²: {r2_score(y_te, bobo):.2f}"</span>)
+
+<span class="cm"># REGRESSÃO LINEAR</span>
+lr = LinearRegression().fit(X_tr, y_tr)
+prev = lr.predict(X_te)
+<span class="fn">print</span>(f<span class="st">"Linear — MAE: {mean_absolute_error(y_te, prev):.2f} | R²: {r2_score(y_te, prev):.2f}"</span>)
+
+<span class="cm"># ÁRVORE DE REGRESSÃO</span>
+dt = DecisionTreeRegressor(max_depth=<span class="nu">5</span>, random_state=<span class="nu">42</span>).fit(X_tr, y_tr)
+prev_dt = dt.predict(X_te)
+<span class="fn">print</span>(f<span class="st">"Árvore — MAE: {mean_absolute_error(y_te, prev_dt):.2f} | R²: {r2_score(y_te, prev_dt):.2f}"</span>)</div>
+
+    <table>
+      <tr><th>Métrica</th><th>Boa quando</th><th>Ruim quando</th></tr>
+      <tr><td><strong>MAE</strong></td><td>Menor que o modelo bobo</td><td>Maior ou igual ao bobo</td></tr>
+      <tr><td><strong>R²</strong></td><td>Próximo de 1.0</td><td>= 0 (igual ao bobo) ou &lt; 0</td></tr>
+    </table>
+
+    <h3 class="sub">Alvo com cauda longa (curtidas, plays)</h3>
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button"><span class="cm"># log1p comprime a cauda; expm1 desfaz</span>
+y_log = np.log1p(y)
+X_tr, X_te, y_tr_log, y_te_log = train_test_split(X, y_log, test_size=<span class="nu">0.25</span>, random_state=<span class="nu">42</span>)
+lr_log = LinearRegression().fit(X_tr, y_tr_log)
+prev_log = np.expm1(lr_log.predict(X_te))
+mae_log = mean_absolute_error(np.expm1(y_te_log), prev_log)
+<span class="fn">print</span>(f<span class="st">"MAE na escala original (com log1p): {mae_log:.2f}"</span>)</div>
+  </section>
+
+  <!-- ===== Q8 CLASSIFICACAO ===== -->
+  <section id="q8">
+    <h2 class="sec"><span class="icon">🏷️</span> Q8 — Classificação</h2>
+    <p>Prever uma <strong>categoria</strong> (ex: viral ou não, alto alcance ou não). Sempre use <code>stratify=y</code> no split.</p>
+
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button"><span class="cm"># CRIAR RÓTULO — decisão metodológica! Documente o corte.</span>
+corte = df[<span class="st">"alcance"</span>].quantile(<span class="nu">0.75</span>)  <span class="cm"># top 25% de alcance = "alto"</span>
+y = (df[<span class="st">"alcance"</span>] >= corte).astype(<span class="kw">int</span>)
+<span class="fn">print</span>(f<span class="st">"Corte: {corte:.0f} | % positivos: {y.mean():.1%}"</span>)
+
+<span class="cm"># FEATURES (mesmas da regressão)</span>
+X = pd.DataFrame(index=df.index)
+X[<span class="st">"tamanho_legenda"</span>] = df[<span class="st">"legenda"</span>].fillna(<span class="st">""</span>).str.len()
+X[<span class="st">"num_hashtags"</span>] = df[<span class="st">"hashtags"</span>].fillna(<span class="st">""</span>).apply(<span class="kw">lambda</span> s: <span class="nu">0</span> <span class="kw">if</span> s=="" <span class="kw">else</span> len(s.split(<span class="st">","</span>)))
+X[<span class="st">"hora"</span>] = pd.to_datetime(df[<span class="st">"data_publicacao"</span>]).dt.hour
+X = pd.get_dummies(X.join(df[[<span class="st">"tema"</span>]]), columns=[<span class="st">"tema"</span>], drop_first=<span class="kw">True</span>)
+
+<span class="cm"># SPLIT COM STRATIFY</span>
+X_tr, X_te, y_tr, y_te = train_test_split(
+    X, y, test_size=<span class="nu">0.25</span>, random_state=<span class="nu">42</span>, stratify=y
+)
+
+<span class="cm"># REGRESSÃO LOGÍSTICA</span>
+lr = LogisticRegression(max_iter=<span class="nu">1000</span>).fit(X_tr, y_tr)
+dec = lr.predict(X_te)
+
+<span class="cm"># AVALIAR</span>
+cm = confusion_matrix(y_te, dec)
+<span class="fn">print</span>(<span class="st">"Matriz de confusão:"</span>)
+<span class="fn">print</span>(cm)
+<span class="fn">print</span>(f<span class="st">"Precisão: {precision_score(y_te, dec, zero_division=0):.3f}"</span>)
+<span class="fn">print</span>(f<span class="st">"Recall:   {recall_score(y_te, dec, zero_division=0):.3f}"</span>)
+<span class="fn">print</span>(f<span class="st">"F1:       {f1_score(y_te, dec, zero_division=0):.3f}"</span>)</div>
+
+    <h3 class="sub">Matriz de confusão — leia assim</h3>
+    <div class="card">
+      <table>
+        <tr><th></th><th>Previu 0</th><th>Previu 1</th></tr>
+        <tr><td><strong>Real 0</strong></td><td style="color:var(--success)">VN (acertou negativo)</td><td style="color:var(--danger)">FP (falso alarme)</td></tr>
+        <tr><td><strong>Real 1</strong></td><td style="color:var(--danger)">FN (perdeu positivo)</td><td style="color:var(--success)">VP (acertou positivo)</td></tr>
+      </table>
+    </div>
+
+    <h3 class="sub">Quando usar cada métrica</h3>
+    <table>
+      <tr><th>Métrica</th><th>Quando importa</th></tr>
+      <tr><td><span class="tag tag-yellow">Acurácia</span></td><td>Só quando classes são equilibradas (50/50)</td></tr>
+      <tr><td><span class="tag tag-blue">Precisão</span></td><td>Quando falso alarme é caro (ex: recomendar errado)</td></tr>
+      <tr><td><span class="tag tag-purple">Recall</span></td><td>Quando não pode perder positivo (ex: detectar fraude)</td></tr>
+      <tr><td><span class="tag tag-green">F1</span></td><td>Equilíbrio — usar sempre na prova como métrica principal</td></tr>
+    </table>
+
+    <h3 class="sub">Árvore + threshold alternativo</h3>
+    <div class="code-block"><button class="copy-btn" onclick="copyCode(this)">Copiar</button"><span class="cm"># ÁRVORE DE CLASSIFICAÇÃO</span>
+dt = DecisionTreeClassifier(max_depth=<span class="nu">4</span>, random_state=<span class="nu">42</span>, class_weight=<span class="st">"balanced"</span>)
+dt.fit(X_tr, y_tr)
+dec_dt = dt.predict(X_te)
+<span class="fn">print</span>(f<span class="st">"Árvore F1: {f1_score(y_te, dec_dt, zero_division=0):.3f}"</span>)
+<span class="fn">print</span>(<span class="st">"Importância:"</span>, pd.Series(dt.feature_importances_, index=X.columns).sort_values(ascending=<span class="kw">False</span>).head(<span class="nu">5</span>))
+
+<span class="cm"># THRESHOLD ALTERNATIVO (mudar corte de 0.5)</span>
+prob = lr.predict_proba(X_te)[:, <span class="nu">1</span>]
+dec_03 = (prob >= <span class="nu">0.30</span>).astype(<span class="kw">int</span>)  <span class="cm"># mais sensível → mais recall</span>
+<span class="fn">print</span>(f<span class="st">"Threshold 0.30 — Recall: {recall_score(y_te, dec_03):.3f} | Precisão: {precision_score(y_te, dec_03):.3f}"</span>)</div>
+  </section>
+
+  <!-- ===== PANDAS REF ===== -->
+  <section id="pandas-ref">
+    <h2 class="sec"><span class="icon">🐼</span> Pandas — referência rápida</h2>
+    <table>
+      <tr><th>Comando</th><th>O que faz</th></tr>
+      <tr><td><code>df.shape</code></td><td>(linhas, colunas)</td></tr>
+      <tr><td><code>df.dtypes</code></td><td>Tipo de cada coluna (object=texto, int/float=número)</td></tr>
+      <tr><td><code>df.head(5)</code></td><td>5 primeiras linhas</td></tr>
+      <tr><td><code>df.isna().sum()</code></td><td>Valores ausentes por coluna</td></tr>
+      <tr><td><code>df.duplicated().sum()</code></td><td>Número de linhas duplicadas</td></tr>
+      <tr><td><code>df.drop_duplicates()</code></td><td>Remove duplicatas</td></tr>
+      <tr><td><code>df.drop_duplicates(subset=["id"])</code></td><td>Remove duplicatas por coluna específica</td></tr>
+      <tr><td><code>df[df["col"] > 0]</code></td><td>Filtrar por condição</td></tr>
+      <tr><td><code>df[df["col"] == "valor"]</code></td><td>Filtrar por valor exato</td></tr>
+      <tr><td><code>df["nova"] = expressão</code></td><td>Criar coluna nova</td></tr>
+      <tr><td><code>df.groupby("col").agg(...).reset_index()</code></td><td>Agrupar e resumir</td></tr>
+      <tr><td><code>df.sort_values("col", ascending=False)</code></td><td>Ordenar</td></tr>
+      <tr><td><code>df["col"].value_counts()</code></td><td>Frequência de cada valor</td></tr>
+      <tr><td><code>df["col"].describe()</code></td><td>Estatísticas básicas</td></tr>
+      <tr><td><code>df["col"].fillna(0)</code></td><td>Preencher ausente com valor</td></tr>
+      <tr><td><code>df.dropna(subset=["col"])</code></td><td>Remove linhas com ausente naquela coluna</td></tr>
+      <tr><td><code>pd.to_datetime(df["col"], errors="coerce")</code></td><td>Texto → data</td></tr>
+      <tr><td><code>pd.to_numeric(df["col"], errors="coerce")</code></td><td>Texto → número</td></tr>
+      <tr><td><code>df["col"].dt.date</code></td><td>Extrai só a data (sem hora)</td></tr>
+      <tr><td><code>df["col"].dt.hour</code></td><td>Extrai a hora</td></tr>
+      <tr><td><code>df.to_csv("arquivo.csv", index=False)</code></td><td>Salva em CSV</td></tr>
+    </table>
+  </section>
+
+  <!-- ===== MATPLOTLIB REF ===== -->
+  <section id="matplotlib-ref">
+    <h2 class="sec"><span class="icon">📊</span> Matplotlib — referência rápida</h2>
+    <table>
+      <tr><th>Comando</th><th>O que faz</th></tr>
+      <tr><td><code>fig, ax = plt.subplots(figsize=(10,5))</code></td><td>Cria figura e eixos</td></tr>
+      <tr><td><code>ax.bar(x, y, color="#hex")</code></td><td>Gráfico de barras</td></tr>
+      <tr><td><code>ax.plot(x, y, marker="o")</code></td><td>Gráfico de linha</td></tr>
+      <tr><td><code>ax.scatter(x, y, alpha=0.5)</code></td><td>Gráfico de dispersão</td></tr>
+      <tr><td><code>ax.set_title("texto")</code></td><td>Título do gráfico</td></tr>
+      <tr><td><code>ax.set_xlabel("texto")</code></td><td>Rótulo eixo X</td></tr>
+      <tr><td><code>ax.set_ylabel("texto com unidade")</code></td><td>Rótulo eixo Y</td></tr>
+      <tr><td><code>ax.tick_params(axis="x", rotation=45)</code></td><td>Gira rótulos do eixo</td></tr>
+      <tr><td><code>fig.text(0.01,-0.04,"Fonte:...",fontsize=8)</code></td><td>Fonte dos dados</td></tr>
+      <tr><td><code>fig.tight_layout()</code></td><td>Ajusta espaçamentos</td></tr>
+      <tr><td><code>plt.show()</code></td><td>Exibe o gráfico</td></tr>
+      <tr><td><code>ax.set_xscale("log")</code></td><td>Escala logarítmica</td></tr>
+    </table>
+  </section>
+
+  <!-- ===== SKLEARN REF ===== -->
+  <section id="sklearn-ref">
+    <h2 class="sec"><span class="icon">🤖</span> scikit-learn — referência rápida</h2>
+    <table>
+      <tr><th>Tarefa</th><th>Código</th></tr>
+      <tr><td>Split treino/teste</td><td><code>train_test_split(X, y, test_size=0.25, random_state=42)</code></td></tr>
+      <tr><td>Split com stratify</td><td><code>train_test_split(X, y, ..., stratify=y)</code></td></tr>
+      <tr><td>Treinar qualquer modelo</td><td><code>modelo.fit(X_tr, y_tr)</code></td></tr>
+      <tr><td>Prever</td><td><code>modelo.predict(X_te)</code></td></tr>
+      <tr><td>Probabilidade (classif.)</td><td><code>modelo.predict_proba(X_te)[:, 1]</code></td></tr>
+      <tr><td>Regressão linear</td><td><code>LinearRegression()</code></td></tr>
+      <tr><td>Árvore regressão</td><td><code>DecisionTreeRegressor(max_depth=5, random_state=42)</code></td></tr>
+      <tr><td>Regressão logística</td><td><code>LogisticRegression(max_iter=1000)</code></td></tr>
+      <tr><td>Árvore classificação</td><td><code>DecisionTreeClassifier(max_depth=4, random_state=42, class_weight="balanced")</code></td></tr>
+      <tr><td>MAE (regressão)</td><td><code>mean_absolute_error(y_te, prev)</code></td></tr>
+      <tr><td>R² (regressão)</td><td><code>r2_score(y_te, prev)</code></td></tr>
+      <tr><td>Modelo bobo</td><td><code>np.full(len(y_te), y_tr.mean())</code></td></tr>
+      <tr><td>Padronizar</td><td><code>StandardScaler().fit_transform(X)</code></td></tr>
+      <tr><td>KMeans</td><td><code>KMeans(n_clusters=3, n_init=10, random_state=42)</code></td></tr>
+      <tr><td>Silhueta</td><td><code>silhouette_score(X_pad, labels)</code></td></tr>
+      <tr><td>Categoria → dummy</td><td><code>pd.get_dummies(X, columns=["col"], drop_first=True)</code></td></tr>
+    </table>
+  </section>
+
+  <!-- ===== REGRAS ===== -->
+  <section id="regras">
+    <h2 class="sec"><span class="icon">⚠️</span> Regras que o professor cobra</h2>
+    <div class="alert alert-danger">
+      <ol class="steps">
+        <li>Nunca coloque o alvo <code>y</code> (nem calculado a partir dele) dentro de <code>X</code> — isso é <strong>VAZAMENTO</strong></li>
+        <li>Sempre compare o modelo com o <strong>modelo bobo</strong> — se não bate, não aprendeu nada</li>
+        <li>Mede o erro no <strong>TESTE</strong>, nunca no treino</li>
+        <li>SEMPRE use <strong>StandardScaler</strong> antes do KMeans</li>
+        <li>Justifique a escolha de <strong>k</strong> (cotovelo + silhueta)</li>
+        <li>Coeficiente descreve <strong>associação</strong>, não causa — não escreva "causa"</li>
+        <li>O <strong>rótulo</strong> da classificação é uma decisão sua — documente o corte e o motivo</li>
+        <li>Nunca avalie classificação <strong>só pela acurácia</strong> quando as classes são desiguais</li>
+        <li>Trabalhe sempre em <strong>cópia</strong> (<code>df.copy()</code>), nunca no bruto</li>
+        <li>Todo gráfico precisa de <strong>título + rótulos + fonte</strong></li>
+      </ol>
+    </div>
+  </section>
+
+  <!-- ===== EMERGENCIA ===== -->
+  <section id="emergencia">
+    <h2 class="sec"><span class="icon">🆘</span> Emergência — quando travar</h2>
+    <table>
+      <tr><th>Problema</th><th>Solução</th></tr>
+      <tr><td>Não sei o nome das colunas</td><td><code>df.columns.tolist()</code></td></tr>
+      <tr><td>Não sei o tipo de uma coluna</td><td><code>df["col"].dtype</code></td></tr>
+      <tr><td>Coluna de texto no X quebra o sklearn</td><td><code>pd.get_dummies(X, columns=["col"], drop_first=True)</code></td></tr>
+      <tr><td>NaN no X quebra o sklearn</td><td><code>X = X.fillna(0)</code> ou <code>X = X.dropna()</code></td></tr>
+      <tr><td>Datas com formatos misturados</td><td><code>pd.to_datetime(df["col"], format="mixed", errors="coerce")</code></td></tr>
+      <tr><td>Texto com encoding estranho</td><td><code>pd.read_csv("arquivo.csv", encoding="latin-1")</code></td></tr>
+      <tr><td>Classificação não prevê nenhum positivo</td><td>Use <code>class_weight="balanced"</code> ou abaixe o threshold</td></tr>
+      <tr><td>R² negativo</td><td>O modelo é pior que chutar a média — verifique vazamento ou features ruins</td></tr>
+      <tr><td>Silhueta baixa para todos os k</td><td>Os dados talvez não tenham estrutura — troque as features</td></tr>
+      <tr><td>Erro "not fitted"</td><td>Você chamou <code>.predict()</code> sem chamar <code>.fit()</code> antes</td></tr>
+      <tr><td>KeyError ao acessar coluna</td><td><code>df.columns.tolist()</code> — o nome pode ter espaço ou acento diferente</td></tr>
+    </table>
+  </section>
+
+</main>
+
+<script>
+function copyCode(btn) {
+  const block = btn.parentElement;
+  const text = block.innerText.replace('Copiar','').replace('Copiado!','').trim();
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = 'Copiado!';
+    btn.classList.add('done');
+    setTimeout(() => { btn.textContent = 'Copiar'; btn.classList.remove('done'); }, 1800);
+  });
+}
+
+function filterNav(q) {
+  const term = q.toLowerCase();
+  document.querySelectorAll('nav ul li').forEach(li => {
+    li.style.display = li.innerText.toLowerCase().includes(term) ? '' : 'none';
+  });
+}
+
+// Highlight active section on scroll
+const sections = document.querySelectorAll('section[id]');
+const navLinks = document.querySelectorAll('nav ul li a');
+window.addEventListener('scroll', () => {
+  let cur = '';
+  sections.forEach(s => { if (window.scrollY >= s.offsetTop - 60) cur = s.id; });
+  navLinks.forEach(a => {
+    a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
+  });
+}, { passive: true });
+</script>
+
+</body>
+</html>
